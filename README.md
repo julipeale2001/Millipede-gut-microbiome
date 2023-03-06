@@ -3,9 +3,9 @@
 
 
 
-# Analysis of 16S, metagenomes and metatranscriptomes included in the paper: [Bacteroidota and Proteobacteria are the major agents of complex polysaccharide degradation in the hindguts of Epibolus pulchripes and Glomeris connexa
+Analysis of 16S, metagenomes and metatranscriptomes included in the paper: [Bacteroidota and Proteobacteria are the major agents of complex polysaccharide degradation in the hindguts of Epibolus pulchripes and Glomeris connexa
 
-# Overview
+Overview
 --------
 
   ├── 1_Bacterial_Colony_Counts_and_qPCR_Qunatification.Rmd
@@ -59,8 +59,8 @@
    ├── README.md # Overview of the repo
     └── references.bib  # Bibtex formatted references cited in the RMD file
 
-# Viewing and reproducing the analysis
+Viewing and reproducing the analysis
 --------
-# The MD files can be used to display the output on github, while HTML files can be used for offline viewing. 
-# The RMD files are best compiled using [knitr](https://yihui.name/knitr/) on [RStudio](https://www.rstudio.com/). 
+The MD files can be used to display the output on github, while HTML files can be used for offline viewing. 
+The RMD files are best compiled using [knitr](https://yihui.name/knitr/) on [RStudio](https://www.rstudio.com/). 
           
