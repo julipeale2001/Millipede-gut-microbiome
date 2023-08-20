@@ -52,6 +52,7 @@ update.packages(
   "compare",
   "ggnewscale",
   "arsenal",
+  "circlize",
   "RColorBrewer",
   "SciViews",
   "ggridges",
@@ -907,3 +908,581 @@ guides(fill=guide_legend(nrow=2))
 
 ggsave("Glo_GHs_phyla_grouped_substrates_top3_MT.svg",width = 40, height = 30, units = "cm")
 ```
+
+
+
+
+**Chord Plot based on relative abundance (TPM)**
+```{r  Epi chord plot coverage, cache = T}
+CEpi$`DE (TPM)`[ CEpi$`DE (TPM)` == 0] <- NA
+CEpi$`RE (TPM)`[ CEpi$`RE (TPM)` == 0] <- NA
+
+CGlo2$`DE (TPM)`[ CGlo2$`DE (TPM)` == 0] <- NA
+CGlo2$`RE (TPM)`[ CGlo2$`RE (TPM)` == 0] <- NA
+
+# Summary relative abundnace (TPM) for E. pulchripes metagenomes at Phylum level
+
+# GHs distributions in phyla for metagenomes from Epibolus
+CEpi2  %>%
+subset(Signalp =="Yes") %>%
+subset(Epibolus =="Yes") %>%
+drop_na(`DE (TPM)`) %>%
+mutate(Category = factor(Category, levels = c("Pectin", "Pectin-hemicellulose", "Hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned"))) %>%
+#summarise(Mean = mean(`DE (TPM)`)) %>%
+group_by(Phylum, Category)  %>%
+summarise(TPM = sum(`DE (TPM)`)/1000) %>%
+arrange(.by_group = TRUE, desc(TPM)) ->
+Epi_MG
+  
+
+order = c("Bacteroidota", "Verrucomicrobiota", "Planctomycetota", "Firmicutes", "Proteobacteria", "Desulfobacterota", "Actinobacteriota", "Bdellovibrionota", "Cyanobacteria", "Deferribacterota", "Elusimicrobiota", "Eremiobacterota", "Myxococcota", "RUG730", "Spirochaetota", "Synergistota",  "Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned")
+
+order1 = c("Bacteroidota", "Verrucomicrobiota", "Planctomycetota", "Firmicutes", "Proteobacteria", "Actinobacteriota", "Bdellovibrionota", "Cyanobacteria", "Deferribacterota", "Desulfobacterota", "Elusimicrobiota", "Eremiobacterota", "Myxococcota", "RUG730", "Spirochaetota", "Synergistota")                                                    
+                                                    
+order2 = c("Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned")
+
+grid.col = c(Bacteroidota = "#0000ffff", Verrucomicrobiota = "#00ff00ff", Planctomycetota = "#c90076ff", Firmicutes = "#ff0000ff", Proteobacteria = "#ffff00ff", Desulfobacterota = "#bf9000ff", Actinobacteriota = "#999999ff", Bdellovibrionota = "#f9cb9cff", Cyanobacteria = "#ead1dcff", Deferribacterota = "#f3f6f4ff",  Elusimicrobiota = "#b4a7d6ff", Eremiobacterota = "#5b5b5bff", Myxococcota = "#ea9999ff", RUG730 = "#d5a6bdff", Spirochaetota = "#45818eff", Synergistota = "#bcbcbcff",  Pectin = "#32CD32", `Pectin-hemicellulose` = "#800000", `Pectin-hemicellulose-cellulose` = "#9400D3", `Hemicellulose-cellulose` = "#FF00FF", Hemicellulose = "#FFFF00", Cellulose = "#FF0000", `Fungal cell wall` = "#000080", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87CEFA", Starch = "#FAF0E6", Sucrose = "#CD5C5C", Trehalose = "#00ff00ff", Dextran = "#808000", Unassigned = "#FF6347")
+
+
+
+grid.colour.substrate = c(Pectin = "#32CD32", `Pectin-hemicellulose` = "#800000", `Pectin-hemicellulose-cellulose` = "#9400D3", `Hemicellulose-cellulose` = "#FF00FF", Hemicellulose = "#FFFF00", Cellulose = "#FF0000", `Fungal cell wall` = "#000080", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87CEFA", Starch = "#FAF0E6", Sucrose = "#CD5C5C", Trehalose = "#00ff00ff", Dextran = "#808000", Unassigned = "#FF6347")
+
+
+grid.colour.phylum = c(Bacteroidota = "#0000ffff", Verrucomicrobiota = "#00ff00ff", Planctomycetota = "#c90076ff", Firmicutes = "#ff0000ff", Proteobacteria = "#ffff00ff", Desulfobacterota = "#bf9000ff", Actinobacteriota = "#999999ff", Bdellovibrionota = "#f9cb9cff", Cyanobacteria = "#ead1dcff", Deferribacterota = "#f3f6f4ff",  Elusimicrobiota = "#b4a7d6ff", Eremiobacterota = "#5b5b5bff", Myxococcota = "#ea9999ff", RUG730 = "#d5a6bdff", Spirochaetota = "#45818eff", Synergistota = "#bcbcbcff")
+
+
+
+set.seed(30000)
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(Epi_MG, annotationTrack = "grid", order = order, grid.col = grid.col, preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9))
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 1, major.tick.percentage = 0.5,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour.substrate, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+
+legend(x = 0.8, y = 0.01, 
+       legend = unique(order1), 
+        fill = grid.colour.phylum, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+
+
+circos.clear()
+
+
+
+# GHs distributions in phyla for metatranscritpomes from Epibolus
+CEpi2  %>%
+subset(Signalp =="Yes") %>%
+subset(Epibolus =="Yes") %>%
+drop_na(`RE (TPM)`) %>%
+mutate(Category = factor(Category, levels = c("Pectin", "Pectin-hemicellulose", "Hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned"))) %>%
+#summarise(Mean = mean(`DE (TPM)`)) %>%
+group_by(Phylum, Category)  %>%
+summarise(TPM = sum(`RE (TPM)`)/1000) %>%
+arrange(.by_group = TRUE, desc(TPM)) ->
+Epi_MT
+  
+
+
+order = c("Bacteroidota", "Verrucomicrobiota", "Planctomycetota", "Firmicutes", "Proteobacteria", "Desulfobacterota", "Actinobacteriota", "Bdellovibrionota", "Cyanobacteria", "Deferribacterota", "Elusimicrobiota", "Eremiobacterota", "Myxococcota", "RUG730", "Spirochaetota", "Synergistota",  "Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned")
+
+order1 = c("Bacteroidota", "Verrucomicrobiota", "Planctomycetota", "Firmicutes", "Proteobacteria", "Actinobacteriota", "Bdellovibrionota", "Cyanobacteria", "Deferribacterota", "Desulfobacterota", "Elusimicrobiota", "Eremiobacterota", "Myxococcota", "RUG730", "Spirochaetota", "Synergistota")                                                    
+                                                    
+order2 = c("Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned")
+
+grid.col = c(Bacteroidota = "#0000ffff", Verrucomicrobiota = "#00ff00ff", Planctomycetota = "#c90076ff", Firmicutes = "#ff0000ff", Proteobacteria = "#ffff00ff", Desulfobacterota = "#bf9000ff", Actinobacteriota = "#999999ff", Bdellovibrionota = "#f9cb9cff", Cyanobacteria = "#ead1dcff", Deferribacterota = "#f3f6f4ff",  Elusimicrobiota = "#b4a7d6ff", Eremiobacterota = "#5b5b5bff", Myxococcota = "#ea9999ff", RUG730 = "#d5a6bdff", Spirochaetota = "#45818eff", Synergistota = "#bcbcbcff",  Pectin = "#32CD32", `Pectin-hemicellulose` = "#800000", `Pectin-hemicellulose-cellulose` = "#9400D3", `Hemicellulose-cellulose` = "#FF00FF", Hemicellulose = "#FFFF00", Cellulose = "#FF0000", `Fungal cell wall` = "#000080", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87CEFA", Starch = "#FAF0E6", Sucrose = "#CD5C5C", Trehalose = "#00ff00ff", Dextran = "#808000", Unassigned = "#FF6347")
+
+
+
+grid.colour.substrate = c(Pectin = "#32CD32", `Pectin-hemicellulose` = "#800000", `Pectin-hemicellulose-cellulose` = "#9400D3", `Hemicellulose-cellulose` = "#FF00FF", Hemicellulose = "#FFFF00", Cellulose = "#FF0000", `Fungal cell wall` = "#000080", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87CEFA", Starch = "#FAF0E6", Sucrose = "#CD5C5C", Trehalose = "#00ff00ff", Dextran = "#808000", Unassigned = "#FF6347")
+
+
+grid.colour.phylum = c(Bacteroidota = "#0000ffff", Verrucomicrobiota = "#00ff00ff", Planctomycetota = "#c90076ff", Firmicutes = "#ff0000ff", Proteobacteria = "#ffff00ff", Desulfobacterota = "#bf9000ff", Actinobacteriota = "#999999ff", Bdellovibrionota = "#f9cb9cff", Cyanobacteria = "#ead1dcff", Deferribacterota = "#f3f6f4ff",  Elusimicrobiota = "#b4a7d6ff", Eremiobacterota = "#5b5b5bff", Myxococcota = "#ea9999ff", RUG730 = "#d5a6bdff", Spirochaetota = "#45818eff", Synergistota = "#bcbcbcff")
+
+
+
+set.seed(30000)
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(Epi_MT, annotationTrack = "grid", order = order, grid.col = grid.col, preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9))
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 1, major.tick.percentage = 0.5,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour.substrate, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+
+legend(x = 0.8, y = 0.01, 
+       legend = unique(order1), 
+        fill = grid.colour.phylum, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+
+
+circos.clear()
+
+
+
+
+
+
+
+
+
+
+
+################################################################ At the family level
+# GHs distributions in family for metagenomes from Epibolus
+
+Epi_MG_F <- CEpi2 %>%
+  filter(Signalp == "Yes" & Epibolus == "Yes") %>%
+  drop_na(`DE (TPM)`) %>%
+  mutate(Category = factor(Category, levels = c("Pectin", "Pectin-hemicellulose", "Hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned"))) %>%
+  group_by(Category, Family) %>%
+  summarize(TPM = sum(`DE (TPM)`)/1000) %>%
+  group_by(Category) %>%
+  arrange(desc(TPM)) %>%
+  slice_head(n = 3)
+  
+order = c("Bacteroidaceae", "UBA4181", "Azobacteroidaceae", "Rikenellaceae", "Victivallaceae", "Opitutaceae", "JABDGR01", "UBA1067", "Enterobacteriaceae", "Thermoguttaceae", "Desulfovibrionaceae", "Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned")
+
+
+order1 = c("Bacteroidaceae", "UBA4181", "Azobacteroidaceae", "Rikenellaceae", "Victivallaceae", "Opitutaceae", "JABDGR01", "UBA1067", "Enterobacteriaceae", "Thermoguttaceae", "Desulfovibrionaceae")                                                    
+                                                    
+order2 = c("Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned")
+
+grid.col = c(Bacteroidaceae = "#00ff00ff", UBA4181 = "#ffff00ff", Azobacteroidaceae = "#0000ffff", Rikenellaceae = "#ff0000ff", Victivallaceae = "#b4a7d6ff", Opitutaceae = "black", JABDGR01 = "#bf9000ff", UBA1067 = "#f3f6f4ff", Enterobacteriaceae = "#999999ff", Thermoguttaceae = "#ea9999ff",  Desulfovibrionaceae = "#5b5b5bff", Pectin = "#ff69b4ff", `Pectin-hemicellulose` = "#8B0000", `Pectin-hemicellulose-cellulose` = "#f4a460ff", `Hemicellulose-cellulose` = "#ffa500ff", Hemicellulose = "#2f4f4fff", Cellulose = "#bc8f8fff", `Fungal cell wall` = "#00bfffff", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87cefaff", Starch = "#faf0e6ff", Sucrose = "#cd5c5cff", Trehalose = "#0b650aff", Dextran = "#808000ff", Unassigned = "#ff6347ff")
+
+
+
+grid.colour.substrate = c(Pectin = "#ff69b4ff", `Pectin-hemicellulose` = "#8B0000", `Pectin-hemicellulose-cellulose` = "#f4a460ff", `Hemicellulose-cellulose` = "#ffa500ff", Hemicellulose = "#2f4f4fff", Cellulose = "#bc8f8fff", `Fungal cell wall` = "#00bfffff", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87cefaff", Starch = "#faf0e6ff", Sucrose = "#cd5c5cff", Trehalose = "#0b650aff", Dextran = "#808000ff", Unassigned = "#ff6347ff")
+
+
+
+grid.colour.phylum = c(Bacteroidaceae = "#00ff00ff", UBA4181 = "#ffff00ff", Azobacteroidaceae = "#0000ffff", Rikenellaceae = "#ff0000ff", Victivallaceae = "#b4a7d6ff", Opitutaceae = "black", JABDGR01 = "#bf9000ff", UBA1067 = "#f3f6f4ff", Enterobacteriaceae = "#999999ff", Thermoguttaceae = "#ea9999ff",  Desulfovibrionaceae = "#5b5b5bff")
+
+
+
+
+set.seed(30000)
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(Epi_MG_F, annotationTrack = "grid", order = order,  grid.col = grid.col,  preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9))
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 1, major.tick.percentage = 0.5,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour.substrate, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+
+legend(x = 0.8, y = 0.01, 
+       legend = unique(order1), 
+        fill = grid.colour.phylum, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+
+
+circos.clear()
+
+
+
+
+# GHs distributions in family for metatranscritpomes from Epibolus
+Epi_MT_F <- CEpi2 %>%
+  filter(Signalp == "Yes" & Epibolus == "Yes") %>%
+  drop_na(`RE (TPM)`) %>%
+  mutate(Category = factor(Category, levels = c("Pectin", "Pectin-hemicellulose", "Hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned"))) %>%
+  group_by(Category, Family) %>%
+  summarize(TPM = sum(`RE (TPM)`)/1000) %>%
+  group_by(Category) %>%
+  arrange(desc(TPM)) %>%
+  slice_head(n = 3)
+
+order = c("Bacteroidaceae", "UBA4181", "Azobacteroidaceae", "Rikenellaceae", "UBA932", "Victivallaceae", "Opitutaceae", "JABDGR01", "Enterobacteriaceae", "Thermoguttaceae", "Desulfovibrionaceae", "Lachnospiraceae", "Burkholderiaceae", "Cellulomonadaceae", "Unclassified", "Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned")
+
+order1 = c("Bacteroidaceae", "UBA4181", "Azobacteroidaceae", "Rikenellaceae", "UBA932", "Victivallaceae", "Opitutaceae", "JABDGR01", "Enterobacteriaceae", "Thermoguttaceae", "Desulfovibrionaceae", "Lachnospiraceae", "Burkholderiaceae", "Cellulomonadaceae", "Unclassified")                                                    
+                                                    
+order2 = c("Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned")
+
+grid.col = c(Bacteroidaceae = "#00ff00ff", UBA4181 = "#ffff00ff", Azobacteroidaceae = "#0000ffff", Rikenellaceae = "#ff0000ff", UBA932 = "#B0E0E6", Victivallaceae = "#b4a7d6ff", Opitutaceae = "black", JABDGR01 = "#bf9000ff", Enterobacteriaceae = "#999999ff", Thermoguttaceae = "#ea9999ff",  Desulfovibrionaceae = "#5b5b5bff", Lachnospiraceae = "#f3f6f4ff", Burkholderiaceae = "#ADFF2F", Cellulomonadaceae = "#AFEEEE", Unclassified = "#FFDAB9",  Pectin = "#ff69b4ff", `Pectin-hemicellulose` = "#8B0000", `Pectin-hemicellulose-cellulose` = "#f4a460ff", `Hemicellulose-cellulose` = "#ffa500ff", Hemicellulose = "#2f4f4fff", Cellulose = "#bc8f8fff", `Fungal cell wall` = "#00bfffff", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87cefaff", Starch = "#faf0e6ff", Sucrose = "#cd5c5cff", Trehalose = "#0b650aff", Dextran = "#808000ff", Unassigned = "#ff6347ff")
+
+
+
+grid.colour.substrate = c(Pectin = "#ff69b4ff", `Pectin-hemicellulose` = "#8B0000", `Pectin-hemicellulose-cellulose` = "#f4a460ff", `Hemicellulose-cellulose` = "#ffa500ff", Hemicellulose = "#2f4f4fff", Cellulose = "#bc8f8fff", `Fungal cell wall` = "#00bfffff", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87cefaff", Starch = "#faf0e6ff", Sucrose = "#cd5c5cff", Trehalose = "#0b650aff", Dextran = "#808000ff", Unassigned = "#ff6347ff")
+
+
+
+grid.colour.phylum = c(Bacteroidaceae = "#00ff00ff", UBA4181 = "#ffff00ff", Azobacteroidaceae = "#0000ffff", Rikenellaceae = "#ff0000ff", UBA932 = "#B0E0E6", Victivallaceae = "#b4a7d6ff", Opitutaceae = "black", JABDGR01 = "#bf9000ff", Enterobacteriaceae = "#999999ff", Thermoguttaceae = "#ea9999ff",  Desulfovibrionaceae = "#5b5b5bff", Lachnospiraceae = "#f3f6f4ff", Burkholderiaceae = "#ADFF2F", Cellulomonadaceae = "#AFEEEE", Unclassified = "#FFDAB9")
+
+set.seed(30000)
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(Epi_MT_F, annotationTrack = "grid", order = order, grid.col = grid.col,  preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9))
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 1, major.tick.percentage = 0.5,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour.substrate, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+
+legend(x = 0.8, y = 0.01, 
+       legend = unique(order1), 
+        fill = grid.colour.phylum, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+
+
+circos.clear()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+# For Glomeirs
+# GHs distributions in phyla metagenomes from Glomeris
+CGlo2  %>%
+subset(Signalp =="Yes") %>%
+subset(Glomeris =="Yes") %>%
+drop_na(`DG (TPM)`) %>%
+mutate(Category = factor(Category, levels = c("Pectin", "Pectin-hemicellulose", "Hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned"))) %>%
+#summarise(Mean = mean(`DE (TPM)`)) %>%
+group_by(Phylum, Category)  %>%
+summarise(TPM = sum(`DG (TPM)`)/100) %>%
+arrange(.by_group = TRUE, desc(TPM)) ->
+Glo_MG
+  
+
+order = c("Bacteroidota", "Firmicutes", "Proteobacteria", "Actinobacteriota", "Desulfobacterota", "Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Trehalose", "Starch")
+
+order1 = c("Bacteroidota", "Firmicutes", "Proteobacteria", "Actinobacteriota", "Desulfobacterota")                                                    
+                                                    
+order2 = c("Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Trehalose", "Starch")
+
+grid.col = c(Bacteroidota = "#0000ffff", Firmicutes = "#ff0000ff", Proteobacteria = "#ffff00ff",  Actinobacteriota = "#999999ff", Desulfobacterota = "#bf9000ff", Pectin = "#32CD32", `Pectin-hemicellulose` = "#800000", `Pectin-hemicellulose-cellulose` = "#9400D3", Hemicellulose = "#FFFF00", `Hemicellulose-cellulose` = "#FF00FF", Cellulose = "#FF0000", `Fungal cell wall` = "#000080", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87CEFA", Trehalose = "#00ff00ff", Starch = "#FAF0E6")
+
+  
+
+grid.colour.substrate = c(Pectin = "#32CD32", `Pectin-hemicellulose` = "#800000", `Pectin-hemicellulose-cellulose` = "#9400D3", Hemicellulose = "#FFFF00", `Hemicellulose-cellulose` = "#FF00FF", Cellulose = "#FF0000", `Fungal cell wall` = "#000080", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87CEFA", Trehalose = "#00ff00ff", Starch = "#FAF0E6")
+
+
+grid.colour.phylum = c(Bacteroidota = "#0000ffff", Firmicutes = "#ff0000ff", Proteobacteria = "#ffff00ff",  Actinobacteriota = "#999999ff", Desulfobacterota = "#bf9000ff")
+
+
+
+set.seed(30000)
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(Glo_MG, annotationTrack = "grid", order = order, grid.col = grid.col, preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9))
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 1, major.tick.percentage = 0.5,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour.substrate, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+
+legend(x = 0.8, y = 0.01, 
+       legend = unique(order1), 
+        fill = grid.colour.phylum, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+
+
+circos.clear()
+
+
+
+
+
+# For Glomeirs
+# GHs distributions in phyla metatranscriptomes from Glomeris
+CGlo2  %>%
+subset(Signalp =="Yes") %>%
+subset(Glomeris =="Yes") %>%
+drop_na(`RG (TPM)`) %>%
+mutate(Category = factor(Category, levels = c("Pectin", "Pectin-hemicellulose", "Hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned"))) %>%
+#summarise(Mean = mean(`DE (TPM)`)) %>%
+group_by(Phylum, Category)  %>%
+summarise(TPM = sum(`RG (TPM)`)/100) %>%
+arrange(.by_group = TRUE, desc(TPM)) ->
+Glo_MT
+  
+
+  
+
+order = c("Bacteroidota", "Firmicutes", "Proteobacteria", "Actinobacteriota", "Desulfobacterota", "Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Trehalose", "Starch")
+
+order1 = c("Bacteroidota", "Firmicutes", "Proteobacteria", "Actinobacteriota", "Desulfobacterota")                                                    
+                                                    
+order2 = c("Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Trehalose", "Starch")
+
+grid.col = c(Bacteroidota = "#0000ffff", Firmicutes = "#ff0000ff", Proteobacteria = "#ffff00ff",  Actinobacteriota = "#999999ff", Desulfobacterota = "#bf9000ff", Pectin = "#32CD32", `Pectin-hemicellulose` = "#800000", `Pectin-hemicellulose-cellulose` = "#9400D3", Hemicellulose = "#FFFF00", `Hemicellulose-cellulose` = "#FF00FF", Cellulose = "#FF0000", `Fungal cell wall` = "#000080", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87CEFA", Trehalose = "#00ff00ff", Starch = "#FAF0E6")
+
+  
+
+grid.colour.substrate = c(Pectin = "#32CD32", `Pectin-hemicellulose` = "#800000", `Pectin-hemicellulose-cellulose` = "#9400D3", Hemicellulose = "#FFFF00", `Hemicellulose-cellulose` = "#FF00FF", Cellulose = "#FF0000", `Fungal cell wall` = "#000080", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87CEFA", Trehalose = "#00ff00ff", Starch = "#FAF0E6")
+
+
+grid.colour.phylum = c(Bacteroidota = "#0000ffff", Firmicutes = "#ff0000ff", Proteobacteria = "#ffff00ff",  Actinobacteriota = "#999999ff", Desulfobacterota = "#bf9000ff")
+
+
+
+set.seed(30000)
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(Glo_MT, annotationTrack = "grid", order = order, grid.col = grid.col, preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9))
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 1, major.tick.percentage = 0.5,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour.substrate, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+
+legend(x = 0.8, y = 0.01, 
+       legend = unique(order1), 
+        fill = grid.colour.phylum, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+
+
+circos.clear()
+
+
+
+
+
+
+
+################################################################ At the family level
+# GHs distributions in family for metagenomes from Glomeris
+
+Glo_MG_F <- CGlo2 %>%
+  filter(Signalp == "Yes" & Glomeris == "Yes") %>%
+  drop_na(`DG (TPM)`) %>%
+  mutate(Category = factor(Category, levels = c("Pectin", "Pectin-hemicellulose", "Hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned"))) %>%
+  group_by(Category, Family) %>%
+  summarize(TPM = sum(`DG (TPM)`)/100) %>%
+  group_by(Category) %>%
+  arrange(desc(TPM)) %>%
+  slice_head(n = 3)
+  
+
+order = c("Enterobacteriaceae", "Aeromonadaceae", "Rhizobiaceae", "Rhodocyclaceae", "Sphingomonadaceae", "Azospirillaceae", "Magnetospirillaceae",  "Dysgonomonadaceae", "Microbacteriaceae", "Unclassified", "Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", 'Algal cell wall', "Starch", "Trehalose")
+
+order1 = c("Enterobacteriaceae", "Aeromonadaceae", "Rhizobiaceae", "Rhodocyclaceae", "Sphingomonadaceae", "Azospirillaceae", "Magnetospirillaceae",  "Dysgonomonadaceae", "Microbacteriaceae", "Unclassified")                                                    
+                                                    
+order2 = c("Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", 'Algal cell wall', "Starch", "Trehalose")
+
+grid.col = c(Enterobacteriaceae = "#999999ff", Aeromonadaceae = "#4169E1",  Rhizobiaceae = "#483D8B", Rhodocyclaceae = "#A0522D", Sphingomonadaceae = "#f9cb9cff", Azospirillaceae = "#DDA0DD", Magnetospirillaceae = "#DAA520", Dysgonomonadaceae = "#FF1493",  Microbacteriaceae = "#00FFFF", Unclassified = "#7CFC00", Pectin = "#ff69b4ff", `Pectin-hemicellulose` = "#8B0000", `Pectin-hemicellulose-cellulose` = "#f4a460ff", `Hemicellulose-cellulose` = "#ffa500ff", Hemicellulose = "#2f4f4fff", Cellulose = "#bc8f8fff", `Fungal cell wall` = "#00bfffff", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87cefaff", Starch = "#faf0e6ff", Trehalose = "#0b650aff")
+
+
+
+grid.colour.substrate = c(Pectin = "#ff69b4ff", `Pectin-hemicellulose` = "#8B0000", `Pectin-hemicellulose-cellulose` = "#f4a460ff", `Hemicellulose-cellulose` = "#ffa500ff", Hemicellulose = "#2f4f4fff", Cellulose = "#bc8f8fff", `Fungal cell wall` = "#00bfffff", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87cefaff", Starch = "#faf0e6ff",  Trehalose = "#0b650aff")
+
+
+
+grid.colour.phylum = c(Enterobacteriaceae = "#999999ff", Aeromonadaceae = "#4169E1",  Rhizobiaceae = "#483D8B", Rhodocyclaceae = "#A0522D", Sphingomonadaceae = "#f9cb9cff", Azospirillaceae = "#DDA0DD", Magnetospirillaceae = "#DAA520", Dysgonomonadaceae = "#FF1493",  Microbacteriaceae = "#00FFFF", Unclassified = "#7CFC00")
+
+
+
+
+set.seed(30000)
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(Glo_MG_F, annotationTrack = "grid", order = order,  grid.col = grid.col, preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9)) 
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 1, major.tick.percentage = 0.5,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour.substrate, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Putative substrates", title.adj = 0.1)
+
+legend(x = 0.8, y = 0.01, 
+       legend = unique(order1), 
+        fill = grid.colour.phylum, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+
+
+circos.clear()
+
+
+
+
+
+
+# family: metatranscriptomes
+Glo_MT_F <- CGlo2 %>%
+  filter(Signalp == "Yes" & Glomeris == "Yes") %>%
+  drop_na(`RG (TPM)`) %>%
+  mutate(Category = factor(Category, levels = c("Pectin", "Pectin-hemicellulose", "Hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Sucrose", "Trehalose", "Dextran", "Unassigned"))) %>%
+  group_by(Category, Family) %>%
+  summarize(TPM = sum(`RG (TPM)`)/100) %>%
+  group_by(Category) %>%
+  arrange(desc(TPM)) %>%
+  slice_head(n = 3)
+  
+
+order = c("Enterobacteriaceae", "Aeromonadaceae",  "Rhizobiaceae", "Rhodocyclaceae", "Sphingomonadaceae",  "Dysgonomonadaceae", "Chitinophagaceae", "CAG-272", "Microbacteriaceae", "Oscillospiraceae", "Unclassified", "Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Trehalose")
+
+order1 = c("Enterobacteriaceae", "Aeromonadaceae",  "Rhizobiaceae", "Rhodocyclaceae", "Sphingomonadaceae", "Dysgonomonadaceae", "Chitinophagaceae",  "CAG-272", "Microbacteriaceae", "Oscillospiraceae", "Unclassified")                                                    
+                                                    
+order2 = c("Pectin", "Pectin-hemicellulose", "Pectin-hemicellulose-cellulose", "Hemicellulose-cellulose", "Hemicellulose", "Cellulose", "Fungal cell wall", "Bacterial cell wall", "Algal cell wall", "Starch", "Trehalose")
+
+grid.col = c(Enterobacteriaceae = "#999999ff", Aeromonadaceae = "#4169E1",  Rhizobiaceae = "#483D8B", Rhodocyclaceae = "#A0522D", Sphingomonadaceae = "#f9cb9cff",   Dysgonomonadaceae = "#FF1493", Chitinophagaceae = "#00FF7F", `CAG-272` = "#DDA0DD",  Microbacteriaceae = "#00FFFF", Oscillospiraceae = "#DDA0DD", Unclassified = "#7CFC00", Pectin = "#ff69b4ff", `Pectin-hemicellulose` = "#8B0000", `Pectin-hemicellulose-cellulose` = "#f4a460ff", `Hemicellulose-cellulose` = "#ffa500ff", Hemicellulose = "#2f4f4fff", Cellulose = "#bc8f8fff", `Fungal cell wall` = "#00bfffff", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87cefaff", Starch = "#faf0e6ff", Trehalose = "#0b650aff")
+
+
+
+grid.colour.substrate = c(Pectin = "#ff69b4ff", `Pectin-hemicellulose` = "#8B0000", `Pectin-hemicellulose-cellulose` = "#f4a460ff", `Hemicellulose-cellulose` = "#ffa500ff", Hemicellulose = "#2f4f4fff", Cellulose = "#bc8f8fff", `Fungal cell wall` = "#00bfffff", `Bacterial cell wall` = "#800080", `Algal cell wall` = "#87cefaff", Starch = "#faf0e6ff", Trehalose = "#0b650aff")
+
+
+
+grid.colour.phylum = c(Enterobacteriaceae = "#999999ff", Aeromonadaceae = "#4169E1",  Rhizobiaceae = "#483D8B", Rhodocyclaceae = "#A0522D", Sphingomonadaceae = "#f9cb9cff", Dysgonomonadaceae = "#FF1493", Chitinophagaceae = "#00FF7F", `CAG-272` = "#DDA0DD",  Microbacteriaceae = "#00FFFF", Oscillospiraceae = "#DDA0DD", Unclassified = "#7CFC00")
+
+
+
+
+set.seed(30000)
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(Glo_MT_F, annotationTrack = "grid", order = order, grid.col = grid.col, preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9)) 
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 1, major.tick.percentage = 0.5,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour.substrate, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+
+legend(x = 0.8, y = 0.01, 
+       legend = unique(order1), 
+        fill = grid.colour.phylum, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+
+
+circos.clear()
+
+```
+
+
