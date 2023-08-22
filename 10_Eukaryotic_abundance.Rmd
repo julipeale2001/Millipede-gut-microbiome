@@ -1,0 +1,363 @@
+---
+title: "Eukaryotic abundance"
+subtitle: "Community abundance of eukaryotes"
+author: "Nweze Julius"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_document:
+    code_folding: show
+    dev: png
+    df_print: kable
+    fig_caption: yes
+    highlight: pygments
+    keep_md: yes
+    number_sections: no
+    theme: flatly
+    toc: yes
+    toc_depth: 5
+    toc_float: yes
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '5'
+link-citations: yes
+csl: fems-microbiology-ecology.csl
+subtitle: CH4 inhibition analysis
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r libraries, include=F}
+# Load libraries
+#.libPaths(c('~/R/library', .libPaths())) # Uncomment if you have no write access to R path
+
+repo <- "http://cran.wu.ac.at"
+lib.loc <- Sys.getenv("R_LIBS_USER")
+
+update.packages(
+    lib.loc, 
+    repos = repo,
+    ask = FALSE
+)
+
+.cran_libs <- c(
+ "knitr", # A General-Purpose Package for Dynamic Report Generation in R
+ "kableExtra", # Construct Complex Table with 'kable' and Pipe Syntax
+#  "rmarkdown", # Dynamic Documents for R
+  "extrafont", # for extra figure fonts
+  "tidyverse", # for dplyr forcats ggplot2 readr tibble
+  "readODS", # #Read ODS Files
+ "grid", # The Grid Graphics Package
+#  "magrittr", # pipes
+  "scales", # Generic plot scaling methods
+  "svglite", # for svg files
+#  "vagen",
+"Polychrome",
+"Cairo",
+"ComplexHeatmap",
+"circlize",
+ "RColorBrewer",
+ "car", # Companion to Applied Regression
+ "rcompanion", #Functions to Support Extension Education Program Evaluation
+ "multcomp", # Simultaneous Inference in General Parametric Models
+ "nlme", # Fit Linear Model Using Generalized Least Squares
+# "ggResidpanel", # Panels and Interactive Versions of Diagnostic Plots using
+ "emmeans", # Estimated Marginal Means, aka Least-Squares Means
+"performance" # Assessment of Regression Models Performance 
+) 
+
+.inst <- .cran_libs %in% installed.packages()
+if (any(!.inst)) {
+   install.packages(.cran_libs[!.inst],
+                    repos = repo,
+                    lib = lib.loc)
+}
+
+.bioc_libs <- c(
+  #"multtest", #Resampling-based multiple hypothesis testing
+)
+
+.bioc_inst <- .bioc_libs %in% installed.packages()
+if (any(!.bioc_inst)) {
+   if (!requireNamespace("BiocManager", quietly = TRUE))
+   install.packages("BiocManager")
+   BiocManager::install(ask = F, lib = lib.loc)  # upgrade bioC packages
+   BiocManager::install(.bioc_libs[!.bioc_inst], ask = F, lib = lib.loc)
+}
+
+.local_libs <- c()
+
+.inst <- names(.local_libs) %in% installed.packages()
+if (any(!.inst)) {
+   install.packages(paste0("~/R/", .local_libs[!.inst]) ,repos = NULL, type = "source", lib = lib.loc)
+}
+
+.github_libs <- c(
+  "wilkelab/ggtext", # Improved text rendering support for 'ggplot2' 
+  "ACCLAB/dabestr" # Data Analysis using Bootstrap-Coupled Estimation 
+)
+
+.github_lib_names <- stringr::str_replace(.github_libs, ".*/(.*)$", "\\1")
+
+.github_inst <- .github_lib_names %in% installed.packages()
+if (any(!.github_inst)) {
+  devtools::install_github(.github_libs[!.github_inst],
+                           lib = lib.loc,
+                           dependencies = TRUE)
+}
+
+# Load packages into session, and print package version
+(loaded.libs <- sapply(c(.cran_libs, .bioc_libs, names(.local_libs), .github_lib_names), require, character.only = TRUE))
+if (!all(loaded.libs)) {stop(paste("Package(s):", names(loaded.libs[loaded.libs == FALSE]), "could not be loaded"))}
+sapply(c(.cran_libs, .bioc_libs, names(.local_libs), .github_lib_names), packageVersion)
+```
+
+```{r style settings, include=F}
+options(width = 90, knitr.table.format = "html") 
+opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  cache = TRUE,
+  dev = "svglite",
+  fig.ext = "svg",
+  dpi = 300,
+#  fig.width = 12,
+#  fig.height = 8,
+  cache.path = "Eukaryotes_cache/",
+  fig.path = "Eukaryotes_figs/"
+)
+f_name <- "DejaVu Sans" #sub("\\s//", "", f_name)
+f_size <- 14
+font_import(pattern = "DejaVuSans", prompt = FALSE)
+loadfonts() # registers fonts
+theme_set(theme_bw(base_size = f_size, base_family = f_name)) # set theme for plots
+pom4 <- ggpomological:::pomological_palette[c(2, 9, 3, 1)] # set colours
+```
+
+
+
+
+# Load data for microbial communities and their abundance
+```{r load vitamin Epi MG data, cache = T}
+ # read_ods("EpiGlo.contigs.taxonomy.ods", sheet = "Output_Epi.contigs.txt.taxonomy",  col_names = TRUE) ->
+ # Commun_EpiGlo
+
+# Save an object to a file
+ # saveRDS(Commun_EpiGlo, file = "RDS/Commun_EpiGlo.rds")
+ Commun_EpiGlo <- readRDS("RDS/Commun_EpiGlo.rds")
+
+
+
+# Load blasbn taxa
+read_ods("EpiGlo.contigs.taxonomy.ods",
+         sheet = "Blast_EpiGlo.taxonomy",  col_names = TRUE) ->
+  Blast_EpiGlo.taxonomy
+
+
+# Save an object to a file
+# saveRDS(Blast_EpiGlo.taxonomy, file = "RDS/Blast_EpiGlo.taxonomy.rds")
+Blast_EpiGlo.taxonomy <- readRDS("RDS/Blast_EpiGlo.taxonomy.rds")
+
+
+
+
+# Load abundance
+# read_ods("EpiGlo.contigs.taxonomy.ods",
+#          sheet = "Abundance",  col_names = TRUE) ->
+#   Commun_EpiGlo_Abundance
+# 
+# 
+# # Save an object to a file
+# saveRDS(Commun_EpiGlo_Abundance, file = "RDS/Commun_EpiGlo_Abundance.rds")
+Commun_EpiGlo_Abundance <- readRDS("RDS/Commun_EpiGlo_Abundance.rds")
+
+
+
+# Load gene length
+read_ods("EpiGlo.contigs.taxonomy.ods", sheet = "Gene_Length",  col_names = TRUE) -> 
+Commun_EpiGlo_gene_length
+
+
+
+
+
+# Merge metaxa2 taxa classification with abundnace
+Community_EpiGlo_Abundance <-  Commun_EpiGlo %>% right_join(Commun_EpiGlo_Abundance, by=c("Species.type", "Contigs"), multiple = "all", relationship = "many-to-many")
+# Save in .csv file
+write_csv(Community_EpiGlo_Abundance, "R_output/Final_Community_EpiGlo_Abundance.ods")
+
+
+# Merge metaxa2 plus blastn taxa classification with abundnace
+Blast_EpiGlo.taxonomy_length <-  Commun_EpiGlo_gene_length  %>% right_join(Commun_EpiGlo_Abundance, by=c("Species.type", "Contigs"), multiple = "all", relationship = "many-to-many") 
+Blast_EpiGlo.taxonomy_Abundance <-  Blast_EpiGlo.taxonomy  %>% right_join(Blast_EpiGlo.taxonomy_length, by=c("Species.type", "Contigs"), multiple = "all", relationship = "many-to-many") 
+
+
+# Save in .csv file
+write_csv(Blast_EpiGlo.taxonomy_Abundance , "R_output/Blast_EpiGlo.taxonomy_Abundance.ods")
+```
+
+
+
+
+**Relative abundance of ssu genes at phylum levels Metaxa2 to blastn**
+```{r load commmunity Epi MG data, cache = T}
+
+
+# Other eukaryotes
+Blast_EpiGlo.taxonomy_Abundance %>%
+subset(Domain == "Other eukaryota") %>%
+filter(!(Phylum %in% c("Annelida", "Arthropoda", "Streptophyta", "Mollusca", "Vertebrata"))) %>%
+group_by(Species.type, Phylum) %>%
+mutate(Domain = coalesce(Domain, "Unclassified"))  %>%
+reframe(DE = sum(TPM)) %>%
+group_by(Species.type) %>%
+mutate(percent = DE/sum(DE)*100) %>%
+group_by(Species.type, Phylum) %>%
+reframe(Percent = percent) ->
+Eu2 
+
+#write.csv(Eu2, "Eu2.csv")
+      
+order = c("G. connexa", "E. pulchripes", "Chlorophyta", "Ochrophyta", "Rhodophyta", "Amoebozoa",  "Apicomplexa",  "Bigyra", "Cercozoa", "Ciliophora", "Discoba", "Mesomycetozoea", "Metamonada",  "Nematoda",  "Rotifera",  "Tardigrada", "Xenacoelomorpha", "Onychophora", "Unclassified eukaryota")
+
+order2 = c("Chlorophyta", "Ochrophyta", "Rhodophyta", "Amoebozoa",  "Apicomplexa",  "Bigyra", "Cercozoa", "Ciliophora", "Discoba", "Mesomycetozoea", "Metamonada",  "Nematoda",  "Rotifera",  "Tardigrada", "Xenacoelomorpha", "Onychophora", "Unclassified eukaryota")
+
+
+
+grid.col = c(`G. connexa` = "#e00272ff", `E. pulchripes` = "#39e789ff", Chlorophyta  = "#FFFF00", Ochrophyta = "#FF4500", Rhodophyta = "#000080",  Amoebozoa  = "#FF00FF",  Apicomplexa = "#800000",  Bigyra = "#808000", Cercozoa = "#0000FF", Ciliophora = "#800080", Discoba = "#FF00FF", Mesomycetozoea = "#008000", Metamonada = "#32CD32",  Nematoda  = "#008080",  Rotifera = "#00FFFF", Tardigrada = "#9400D3", Xenacoelomorpha = "#87CEFA", Onychophora  = "#006400", `Unclassified eukaryota` = "#F5DEB3")
+
+grid.colour = c(Chlorophyta  = "#FFFF00", Ochrophyta = "#FF4500", Rhodophyta = "#000080",  Amoebozoa  = "#FF00FF",  Apicomplexa = "#800000",  Bigyra = "#808000", Cercozoa = "#0000FF", Ciliophora = "#800080", Discoba = "#FF00FF", Mesomycetozoea = "#008000", Metamonada = "#32CD32",  Nematoda  = "#008080",  Rotifera = "#00FFFF", Tardigrada = "#9400D3", Xenacoelomorpha = "#87CEFA", Onychophora  = "#006400", `Unclassified eukaryota` = "#F5DEB3")
+
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+set.seed(30000)
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(Eu2, annotationTrack = "grid", order = order, grid.col = grid.col, preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9))
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 0.7, major.tick.percentage = 0.2,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+legend(x = 0.8, y = 0.001, 
+       legend = unique(Eu2$Species.type), 
+        fill = grid.species, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+
+highlight.sector(Eu1$Phylum[which(Eu1$Phylum ==  "Amoebozoa" | Eu1$Phylum ==   "Apicomplexa" | Eu1$Phylum ==   "Bigyra" | Eu1$Phylum ==  "Cercozoa" | Eu1$Phylum ==  "Ciliophora" | Eu1$Phylum == "Discoba" | Eu1$Phylum ==  "Mesomycetozoea" | Eu1$Phylum ==  "Metamonada" | Eu1$Phylum ==   "Nematoda" | Eu1$Phylum ==   "Rotifera" | Eu1$Phylum ==   "Tardigrada" | Eu1$Phylum ==  "Xenacoelomorpha" |  Eu1$Phylum ==  "Onychophora" | Eu1$Phylum ==  "Unclassified eukaryota")], track.index = 1, col = "#39e789ff", padding = c(-.2, 0, -.3, 0), text = "Other eukaryotes", cex = 1.2, text.col = "black", niceFacing = TRUE)
+
+highlight.sector(Eu1$Phylum[which(Eu1$Phylum == "Chlorophyta" | Eu1$Phylum == "Ochrophyta"| Eu1$Phylum ==  "Rhodophyta")], track.index = 1, col = "#C0C0C0", padding = c(-.2, 0, -.3, 0), text = "Algae", cex = 1.2, text.col = "black", niceFacing = TRUE)
+
+
+# re-set circos parameters
+circos.clear()
+
+```
+
+
+
+
+
+**Microbial community abundance in metatranscriptome
+```{r load commmunity Epi MT data, cache = T}
+# Load abundance
+read_ods("EpiGlo.contigs.taxonomy.ods", sheet = "Microbial_abundance_metatranscriptome",  col_names = TRUE) ->
+MT_EpiGlo_Abundance
+
+
+# # Save an object to a file
+saveRDS(MT_EpiGlo_Abundance, file = "RDS/MT_EpiGlo_Abundance.rds")
+MT_EpiGlo_Abundance <- readRDS("RDS/MT_EpiGlo_Abundance.rds")
+
+################################################ Plotting other eukaryotic abundance
+MT_EpiGlo_Abundance %>%
+filter(!(`Common.name` %in% c("Other eukaryota", "Worms", "Viruses", "Bacteria", "Fungi", "Archaea"))) %>%
+filter(!(Contigs %in% c("c_000000112922", "c_000000112922"))) %>%
+subset(TPM>0) %>%
+group_by(Species.type, Phylum) %>%
+#mutate(`Common name` = coalesce(`Common name`, "Unclassified"))  %>%
+reframe(DE = sum(TPM)) %>%
+group_by(Species.type) %>%
+mutate(percent = DE/sum(DE)*100) %>%
+group_by(Species.type, Phylum) %>%
+reframe(Percent = percent) ->
+MT_other_eukaryota
+write.csv(MT_other_eukaryota, "MT_Other_eukaryota.csv")
+
+#write.csv(Eu2, "Eu2.csv")
+      
+order = c("G. connexa", "E. pulchripes", "Chlorophyta", "Ochrophyta", "Rhodophyta", "Cryptista", "Amoebozoa",  "Apicomplexa", "Apusozoa", "Bigyra", "Bryozoa", "Cercozoa", "Choanoflagellata", "Ciliophora", "Colpodellida", "Endomyxa", "Euglenozoa", "Filasterea", "Heterolobosea", "Loukozoa", "Metamonada", "Myzozoa",  "Nematoda", "Perkinsozoa", "Placozoa", "Rotifera", "Rotosphaerida")
+
+order2 = c("G. connexa", "E. pulchripes")
+
+order2 = c("Chlorophyta", "Ochrophyta", "Rhodophyta", "Cryptista", "Amoebozoa",  "Apicomplexa", "Apusozoa", "Bigyra", "Bryozoa", "Cercozoa", "Choanoflagellata", "Ciliophora", "Colpodellida", "Endomyxa", "Euglenozoa", "Filasterea", "Heterolobosea", "Loukozoa", "Metamonada", "Myzozoa",  "Nematoda", "Perkinsozoa", "Placozoa", "Rotifera", "Rotosphaerida")
+
+
+
+grid.col = c(`G. connexa` = "#e00272ff", `E. pulchripes` = "#39e789ff", Chlorophyta = "#FFFF00", Ochrophyta = "#FF4500", Rhodophyta = "#000080", Cryptista = "#B8860B", Amoebozoa = "#FF00FF",  Apicomplexa = "#800000", Apusozoa = "#458B74", Bigyra = "#808000", Bryozoa = "#FF7F50", Cercozoa = "#0000FF", Choanoflagellata = "#FFF8DC", Ciliophora = "#800080", Colpodellida = "#7FFF00", Endomyxa = "#556B2F", Euglenozoa = "#FF1493", Filasterea = "#2F4F4F", Heterolobosea = "#00B2EE", Loukozoa = "#FFD700", Metamonada = "#32CD32", Myzozoa = "#DAA520",  Nematoda = "#008080", Perkinsozoa = "#CD6090", Placozoa = "#F0E68C",  Rotifera = "#00FFFF", Rotosphaerida = "#B0E2FF")
+
+
+
+
+grid.species = c(`G. connexa` = "#e00272ff", `E. pulchripes` = "#39e789ff")
+
+
+grid.colour = c(Chlorophyta = "#FFFF00", Ochrophyta = "#FF4500", Rhodophyta = "#000080", Cryptista = "#B8860B", Amoebozoa = "#FF00FF",  Apicomplexa = "#800000", Apusozoa = "#458B74", Bigyra = "#808000", Bryozoa = "#FF7F50", Cercozoa = "#0000FF", Choanoflagellata = "#FFF8DC", Ciliophora = "#800080", Colpodellida = "#7FFF00", Endomyxa = "#556B2F", Euglenozoa = "#FF1493", Filasterea = "#2F4F4F", Heterolobosea = "#00B2EE", Loukozoa = "#FFD700", Metamonada = "#32CD32", Myzozoa = "#DAA520",  Nematoda = "#008080", Perkinsozoa = "#CD6090", Placozoa = "#F0E68C",  Rotifera = "#00FFFF", Rotosphaerida = "#B0E2FF")
+
+
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+set.seed(30000)
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(MT_other_eukaryota, annotationTrack = "grid", order = order, grid.col = grid.col, preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9))
+circos.info()
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 0.7, major.tick.percentage = 0.2,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+legend(x = -1.4, y = 0.001, 
+       legend = unique(MT_other_eukaryota$Species.type), 
+        fill = grid.species, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+
+highlight.sector(MT_other_eukaryota$Phylum[which(MT_other_eukaryota$Phylum == "Amoebozoa" | MT_other_eukaryota$Phylum ==  "Apicomplexa" | MT_other_eukaryota$Phylum ==  "Bigyra" | MT_other_eukaryota$Phylum ==  "Bryozoa" | MT_other_eukaryota$Phylum ==  "Cercozoa" | MT_other_eukaryota$Phylum ==  "Choanoflagellata" | MT_other_eukaryota$Phylum ==  "Ciliophora" | MT_other_eukaryota$Phylum ==  "Colpodellida" | MT_other_eukaryota$Phylum ==  "Endomyxa" | MT_other_eukaryota$Phylum ==  "Euglenozoa" | MT_other_eukaryota$Phylum ==  "Filasterea" | MT_other_eukaryota$Phylum ==  "Heterolobosea" | MT_other_eukaryota$Phylum ==  "Loukozoa" | MT_other_eukaryota$Phylum ==  "Metamonada" | MT_other_eukaryota$Phylum ==  "Myzozoa" | MT_other_eukaryota$Phylum ==  "Nematoda" | MT_other_eukaryota$Phylum ==  "Perkinsozoa" | MT_other_eukaryota$Phylum == "Rotifera" | MT_other_eukaryota$Phylum ==  "Rotosphaerida")], track.index = 1, col = "#39e789ff", padding = c(-.2, 0, -.3, 0), text = "Other eukaryotes", cex = 1.2, text.col = "black", niceFacing = TRUE)
+
+
+highlight.sector(MT_other_eukaryota$Phylum[which(MT_other_eukaryota$Phylum == "Chlorophyta" | MT_other_eukaryota$Phylum == "Ochrophyta" | MT_other_eukaryota$Phylum ==  "Cryptista")], track.index = 1, col = "#C0C0C0", padding = c(-.2, 0, -.3, 0), text = "Algae", cex = 1.2, text.col = "black", niceFacing = TRUE)
+
+ 
+
+
+
+
+# re-set circos parameters
+circos.clear()
+
+
+```
