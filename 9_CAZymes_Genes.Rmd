@@ -1486,3 +1486,135 @@ circos.clear()
 ```
 
 
+
+
+
+
+
+################################################ Plotting Fungi abundance
+MT_EpiGlo_Abundance %>%
+subset(`Common.name` == "Fungi") %>%
+group_by(Species.type, Phylum) %>%
+#mutate(`Common name` = coalesce(`Common name`, "Unclassified"))  %>%
+reframe(DE = sum(TPM)) %>%
+group_by(Species.type) %>%
+mutate(percent = DE/sum(DE)*100) %>%
+group_by(Species.type, Phylum) %>%
+reframe(Percent = percent) ->
+MT_fungi
+write.csv(MT_fungi, "MT_fungi.csv")
+
+
+order = c("G. connexa", "E. pulchripes", "Ascomycota", "Basidiomycota", "Blastocladiomycota", "Chytridiomycota", "Microsporidia", "Mucoromycota", "Oomycota", "Porifera", "Unclassified fungi")
+
+order1 = c("G. connexa", "E. pulchripes")
+
+order2 = c("Ascomycota", "Basidiomycota", "Blastocladiomycota", "Chytridiomycota", "Microsporidia", "Mucoromycota", "Oomycota", "Porifera", "Unclassified fungi")
+
+
+
+grid.col = c(`G. connexa` = "#e00272ff", `E. pulchripes` = "#39e789ff", Ascomycota = "#CD5C5C", Basidiomycota = "#A52A2A", Blastocladiomycota = "#104E8B", Chytridiomycota  = "#FF6347", Microsporidia = "#E9967A",  Mucoromycota= "#00FF00", Oomycota = "#8B4500", Porifera = "#458B00", `Unclassified fungus` = "#FF0000")
+
+grid.species = c(`G. connexa` = "#e00272ff", `E. pulchripes` = "#39e789ff")
+
+grid.colour = c(Ascomycota = "#CD5C5C", Basidiomycota = "#A52A2A", Blastocladiomycota = "#104E8B", Chytridiomycota  = "#FF6347", Microsporidia = "#E9967A",  Mucoromycota= "#00FF00", Oomycota = "#8B4500", Porifera = "#458B00", `Unclassified fungus` = "#FF0000")
+
+
+
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+set.seed(30000)
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(MT_fungi, annotationTrack = "grid", order = order, grid.col = grid.col, preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9))
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 0.7, major.tick.percentage = 0.2,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+legend(x = 0.8, y = 0.001, 
+       legend = unique(Fu1$Species.type), 
+        fill = grid.species, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+circos.clear()
+
+
+
+
+
+
+
+
+
+
+
+# Fungi
+Blast_EpiGlo.taxonomy_Abundance %>%
+subset(Domain == "Fungi") %>%
+group_by(Species.type, Phylum) %>%
+mutate(Domain = coalesce(Domain, "Unclassified"))  %>%
+reframe(DE = sum(TPM)) %>%
+group_by(Species.type) %>%
+mutate(percent = DE/sum(DE)*100) %>%
+group_by(Species.type, Phylum) %>%
+reframe(Percent = percent) ->
+Fu1 
+
+#write.csv(Eu1, "Eu2.csv")
+order = c("G. connexa", "E. pulchripes", "Ascomycota", "Basidiomycota", "Chytridiomycota",  "Mucoromycota", "Zoopagomycota", "Microsporidia",  "Unclassified fungus")
+
+order2 = c("Ascomycota", "Basidiomycota", "Chytridiomycota",  "Mucoromycota", "Zoopagomycota", "Microsporidia",  "Unclassified fungus")
+
+
+
+grid.col = c(`G. connexa` = "#e00272ff", `E. pulchripes` = "#39e789ff", Ascomycota = "#CD5C5C", Basidiomycota = "#A52A2A", Chytridiomycota  = "#FF6347",  Mucoromycota= "#00FF00", Zoopagomycota  = "#2E8B57", Microsporidia = "#E9967A",  `Unclassified fungus` = "#FF0000")
+
+grid.colour = c(Ascomycota = "#CD5C5C", Basidiomycota = "#A52A2A", Chytridiomycota  = "#FF6347",  Mucoromycota= "#00FF00", Zoopagomycota  = "#2E8B57", Microsporidia = "#E9967A",  `Unclassified fungus` = "#FF0000")
+
+# now, the image with rotated labelsgap = rep(1, length(order))par(cex = 3, mar = c(0, 0, 0, 0))
+set.seed(30000)
+par(cex = 2.2, mar = c(0, 0, 0, 0))
+circos.clear()
+chordDiagram(Fu1, annotationTrack = "grid", order = order, grid.col = grid.col, preAllocateTracks = 1, grid.border = 1, transparency = 0.8, annotationTrackHeight = mm_h(9))
+circos.info()
+# add labels and axis manually
+circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+  xlim = get.cell.meta.data("xlim")
+  ylim = get.cell.meta.data("ylim")
+  sector.name = get.cell.meta.data("sector.index")
+  # print axis
+  circos.axis(h = "top", labels.cex = 0.7, major.tick.percentage = 0.2,
+              sector.index = sector.name, track.index = 2)
+}, bg.border = NA)
+
+legend(x = 0.8, y = 1.1, 
+       legend = unique(order2), 
+        fill = grid.colour, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Phylum", title.adj = 0.1) 
+legend(x = 0.8, y = 0.001, 
+       legend = unique(Fu1$Species.type), 
+        fill = grid.species, 
+       bty = "n", cex = 0.8,
+       x.intersp = 0.5, 
+       title = "Species type", title.adj = 0.1)
+circos.clear()
+
+
+
+```
+
