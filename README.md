@@ -3,7 +3,7 @@
 
 
 
-Analysis of 16S, metagenomes and metatranscriptomes included in the paper: [Bacteroidota and Proteobacteria are the major agents of complex polysaccharide degradation in the hindguts of Epibolus pulchripes and Glomeris connexa
+Analysis of 16S, metagenomes and metatranscriptomes included in the paper: Functional similarity despite taxonomical divergence in the millipede gut microbiota points to a common trophic strategy
 
 Overview
 --------
