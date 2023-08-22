@@ -1,0 +1,160 @@
+DATASET_HEATMAP
+#In heatmaps, each ID is associated to multiple numeric values, which are displayed as a set of colored boxes defined by a color gradient
+#lines starting with a hash are comments and ignored during parsing
+#=================================================================#
+#                    MANDATORY SETTINGS                           #
+#=================================================================#
+#select the separator which is used to delimit the data below (TAB,SPACE or COMMA).This separator must be used throughout this file.
+#SEPARATOR TAB
+SEPARATOR SPACE
+#SEPARATOR COMMA
+
+#label is used in the legend table (can be changed later)
+DATASET_LABEL Epi_gene_DE_coverage
+
+#dataset color (can be changed later)
+COLOR #ff0000
+
+#define labels for each individual field column
+FIELD_LABELS porA acs acdA ack pta fdhF fhs folD metF acsE acsB acsC/cdhE acsD/cdhD acsA/cooS
+
+
+
+
+
+
+
+#=================================================================#
+#                    OPTIONAL SETTINGS                            #
+#=================================================================#
+
+
+#Heatmaps can have an optional Newick formatted tree assigned. Its leaf IDs must exactly match the dataset FIELD_LABELS.
+#The tree will be used to sort the dataset fields, and will be displayed above the dataset. It can have branch lengths defined.
+#All newlines and spaces should be stripped from the tree, and COMMA cannot be used as the dataset separator if a FIELD_TREE is provided.
+#FIELD_TREE (((f1:0.2,f5:0.5):1,(f2:0.2,f3:0.3):1.2):0.5,(f4:0.1,f6:0.5):0.8):1;
+
+
+#=================================================================#
+#     all other optional settings can be set or changed later     #
+#           in the web interface (under 'Datasets' tab)           #
+#=================================================================#
+
+#Each dataset can have a legend, which is defined using LEGEND_XXX fields below
+#For each row in the legend, there should be one shape, color and label.
+#Optionally, you can define an exact legend position using LEGEND_POSITION_X and LEGEND_POSITION_Y. To use automatic legend positioning, do NOT define these values
+#Optionally, shape scaling can be present (LEGEND_SHAPE_SCALES). For each shape, you can define a scaling factor between 0 and 1.
+#Shape should be a number between 1 and 6, or any protein domain shape definition.
+#1: square
+#2: circle
+#3: star
+#4: right pointing triangle
+#5: left pointing triangle
+#6: checkmark
+
+#LEGEND_TITLE,Dataset legend
+#LEGEND_POSITION_X,100
+#LEGEND_POSITION_Y,100
+#LEGEND_SHAPES,1,2,3
+#LEGEND_COLORS,#ff0000,#00ff00,#0000ff
+#LEGEND_LABELS,value1,value2,value3
+#LEGEND_SHAPE_SCALES,1,1,0.5
+
+#left margin, used to increase/decrease the spacing to the next dataset. Can be negative, causing datasets to overlap.
+#MARGIN 0
+
+#width of the individual boxes
+#STRIP_WIDTH 25
+
+#always show internal values; if set, values associated to internal nodes will be displayed even if these nodes are not collapsed. It could cause overlapping in the dataset display.
+#SHOW_INTERNAL 0
+
+
+#show dashed lines between leaf labels and the dataset
+#DASHED_LINES 1
+
+#if a FIELD_TREE is present, it can be hidden by setting this option to 0
+#SHOW_TREE 1
+
+#define the color for the NULL values in the dataset. Use the letter X in the data to define the NULL values
+#COLOR_NAN #000000
+
+#automatically create and display a legend based on the color gradients and values defined below
+#AUTO_LEGEND 1
+
+#define the heatmap gradient colors. Values in the dataset will be mapped onto the corresponding color gradient.
+COLOR_MIN #ff0000
+COLOR_MAX #0000ff
+
+#you can specify a gradient with three colors (e.g red to yellow to green) by setting 'USE_MID_COLOR' to 1, and specifying the midpoint color
+#USE_MID_COLOR 1
+#COLOR_MID #ffff00
+
+#By default, color gradients will be calculated based on dataset values. You can force different values to use in the calculation by setting the values below:
+#USER_MIN_VALUE 0
+#USER_MID_VALUE 500
+#USER_MAX_VALUE 1000
+
+#border width; if set above 0, a border of specified width (in pixels) will be drawn around individual cells
+#BORDER_WIDTH 0
+
+#border color; used only when BORDER_WIDTH is above 0
+#BORDER_COLOR #0000ff
+
+#display or hide the text labels above each field column
+#SHOW_LABELS 1
+
+#text label size factor
+#SIZE_FACTOR 1
+
+#text label rotation
+#LABEL_ROTATION 0
+
+#text label shift in pixels (positive or negative)
+#LABEL_SHIFT 0
+
+
+#Internal tree nodes can be specified using IDs directly, or using the 'last common ancestor' method described in iTOL help pages
+#=================================================================#
+#       Actual data follows after the "DATA" keyword              #
+#=================================================================#
+DATA
+#ID1 value1 value2 value3 value4 value5 value6
+#You can use the 'X' letter instead of the numeric value to denote the empty fields. These will be colored using 'COLOR_NAN' option set above.
+#9606 100 300 250 100 50 210
+#15303 20 X 130 200 300 15
+EG_MAG_00001 x 4.50808447700419 x x x x x 3.98484140691806 x x x x x x
+EG_MAG_00029 x 4.11767262811942 x x 5.09685820879831 x x x x x x x x x
+EG_MAG_00045 x 4.88289372293008 x 5.40262556122464 x x x 3.63291422512333 x x x x x x
+EG_MAG_00049 x 5.05270661411199 x x x 4.72946635131935 4.54039490189546 4.33433013536014 x x x x x x
+EG_MAG_00050 5.08465569235093 x x 3.75520758700708 3.32801652016788 x x x x x x x x x
+EG_MAG_00070 x x x x x x 3.81220294274338 x x x x x x x
+EG_MAG_00077 x 4.35773369795267 3.78351215694074 3.99674677838329 2.56381519352483 4.18406171680914 x x x x x x x x
+EG_MAG_00081 x 4.58685991327528 5.78193561133137 4.69607911200343 x x x 3.5364321631935 x x x x x x
+EG_MAG_00089 x 5.1558886064419 x 5.03686022248993 4.68363663560313 x 3.43856049015605 4.42452960117275 x x x x x x
+EG_MAG_00110 x x x 4.66928389959225 x x 5.22000972489903 4.72503605587462 4.82441577246716 x x x x x
+EG_MAG_00122 x x x x x x x x x x x x x x
+EG_MAG_00123 x x x x x x x x x x x x x x
+EG_MAG_00124 x x x x x x x x x x x x x x
+EG_MAG_00125 x x x x x 4.28180617061606 x 1.6488687178145 x x x x x x
+EG_MAG_00132 4.80469715724548 x x 4.08565191171378 3.24691360471877 x 3.87137843236232 x x x x x x x
+EG_MAG_00134 5.68380364300857 4.7349436854698 x 4.69861879028286 x 4.61291391613562 x 4.47346600663842 5.32562701675013 x x x x x
+EG_MAG_00153 x x x x x x 3.38416852031744 x x x x x x x
+EG_MAG_00164 4.56131829774318 x x 4.41676727176417 x 3.58343641807593 x 3.19925481987085 x x x x x x
+EG_MAG_00185 x 4.90261894012513 5.58958930754154 3.64606213646302 3.64226865444709 x x 3.18861297862913 4.74380619625788 x x x x x
+EG_MAG_00187 x x x 3.44488471274867 x x x 2.98038217185364 x x x x x x
+EG_MAG_00201 x x x 3.15071257850666 x x x x x x x x x x
+EG_MAG_00207 x x x 4.06646559785155 x x x x x x x x x x
+EG_MAG_00216 x 4.7157766579311 x 3.62092401295391 x 4.7392584648822 4.6261835413012 4.04580390883279 x x x x x x
+EG_MAG_00230 x x x x x x 2.98068896994498 x x x 5.76324315444415 5.52288004816183 5.82390939238555 5.82390939238555
+EG_MAG_00241 x 4.76770694161701 x 4.8035646516084 4.85369058458977 4.59518673768055 4.90254103579037 x x x x x x x
+EG_MAG_00248 x x x 3.16582836557141 x x 4.31947953773512 x x x x x x x
+EG_MAG_00249 x x x 3.99148963746054 x 3.02395406022205 x 3.31700035216878 x x x x x x
+EG_MAG_00264 5.47047282260976 x x x x 4.20127070528748 3.13846403623141 x x x x x x x
+EG_MAG_00272 x 5.28511002546758 x 4.47110116657724 5.15745227606948 4.4752600698769 4.46815193272883 4.50156739535252 x x x x x x
+EG_MAG_00275 x 5.09075252952442 x 4.08347514708818 4.8236405377612 4.34495505046906 x 3.96652973255782 x x x x x x
+EG_MAG_00280 x x x 4.80078792022745 5.08423292807355 4.93256214340522 x 4.9414182033552 x x x x x x
+EG_MAG_00288 x x x x x x x x x x x x x x
+EG_MAG_00293 x x x 3.86236798943138 x x 3.2807160875594 x x x x x x x
+EG_MAG_00297 x x x 3.92909911616275 5.18069704987147 3.77291028829072 x 4.01378771040223 x x x x x x
+

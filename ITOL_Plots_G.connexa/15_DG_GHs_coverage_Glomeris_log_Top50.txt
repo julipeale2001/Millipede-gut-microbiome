@@ -1,0 +1,154 @@
+DATASET_HEATMAP
+#In heatmaps, each ID is associated to multiple numeric values, which are displayed as a set of colored boxes defined by a color gradient
+#lines starting with a hash are comments and ignored during parsing
+#=================================================================#
+#                    MANDATORY SETTINGS                           #
+#=================================================================#
+#select the separator which is used to delimit the data below (TAB,SPACE or COMMA).This separator must be used throughout this file.
+#SEPARATOR TAB
+SEPARATOR SPACE
+#SEPARATOR COMMA
+
+#label is used in the legend table (can be changed later)
+DATASET_LABEL Glo_DG
+
+
+#dataset color (can be changed later)
+COLOR #ff0000
+
+#define labels for each individual field column
+FIELD_LABELS GH105 GH106 GH127 GH28 GH78 GH88 GH141 GH146 GH35 GH43_10 GH43_33 GH43_34 GH53 GH10 GH154 GH16_3 GH26 GH27 GH3 GH36 GH38 GH51 GH95 GH2 GH116 GH39 GH109 GH110 GH123 GH125 GH144 GH163 GH18 GH20 GH23 GH33 GH76 GH92 GH102 GH103 GH171 GH172 GH25 GH73 GH29 GH50 GH13 GH31 GH97 GH32
+
+
+
+
+
+
+
+#=================================================================#
+#                    OPTIONAL SETTINGS                            #
+#=================================================================#
+
+
+#Heatmaps can have an optional Newick formatted tree assigned. Its leaf IDs must exactly match the dataset FIELD_LABELS.
+#The tree will be used to sort the dataset fields, and will be displayed above the dataset. It can have branch lengths defined.
+#All newlines and spaces should be stripped from the tree, and COMMA cannot be used as the dataset separator if a FIELD_TREE is provided.
+#FIELD_TREE (((f1:0.2,f5:0.5):1,(f2:0.2,f3:0.3):1.2):0.5,(f4:0.1,f6:0.5):0.8):1;
+
+
+#=================================================================#
+#     all other optional settings can be set or changed later     #
+#           in the web interface (under 'Datasets' tab)           #
+#=================================================================#
+
+#Each dataset can have a legend, which is defined using LEGEND_XXX fields below
+#For each row in the legend, there should be one shape, color and label.
+#Optionally, you can define an exact legend position using LEGEND_POSITION_X and LEGEND_POSITION_Y. To use automatic legend positioning, do NOT define these values
+#Optionally, shape scaling can be present (LEGEND_SHAPE_SCALES). For each shape, you can define a scaling factor between 0 and 1.
+#Shape should be a number between 1 and 6, or any protein domain shape definition.
+#1: square
+#2: circle
+#3: star
+#4: right pointing triangle
+#5: left pointing triangle
+#6: checkmark
+
+#LEGEND_TITLE,Dataset legend
+#LEGEND_POSITION_X,100
+#LEGEND_POSITION_Y,100
+#LEGEND_SHAPES,1,2,3
+#LEGEND_COLORS,#ff0000,#00ff00,#0000ff
+#LEGEND_LABELS,value1,value2,value3
+#LEGEND_SHAPE_SCALES,1,1,0.5
+
+#left margin, used to increase/decrease the spacing to the next dataset. Can be negative, causing datasets to overlap.
+#MARGIN 0
+
+#width of the individual boxes
+#STRIP_WIDTH 25
+
+#always show internal values; if set, values associated to internal nodes will be displayed even if these nodes are not collapsed. It could cause overlapping in the dataset display.
+#SHOW_INTERNAL 0
+
+
+#show dashed lines between leaf labels and the dataset
+#DASHED_LINES 1
+
+#if a FIELD_TREE is present, it can be hidden by setting this option to 0
+#SHOW_TREE 1
+
+#define the color for the NULL values in the dataset. Use the letter X in the data to define the NULL values
+#COLOR_NAN #000000
+
+#automatically create and display a legend based on the color gradients and values defined below
+#AUTO_LEGEND 1
+
+#define the heatmap gradient colors. Values in the dataset will be mapped onto the corresponding color gradient.
+COLOR_MIN #ff0000
+COLOR_MAX #0000ff
+
+#you can specify a gradient with three colors (e.g red to yellow to green) by setting 'USE_MID_COLOR' to 1, and specifying the midpoint color
+#USE_MID_COLOR 1
+#COLOR_MID #ffff00
+
+#By default, color gradients will be calculated based on dataset values. You can force different values to use in the calculation by setting the values below:
+#USER_MIN_VALUE 0
+#USER_MID_VALUE 500
+#USER_MAX_VALUE 1000
+
+#border width; if set above 0, a border of specified width (in pixels) will be drawn around individual cells
+#BORDER_WIDTH 0
+
+#border color; used only when BORDER_WIDTH is above 0
+#BORDER_COLOR #0000ff
+
+#display or hide the text labels above each field column
+#SHOW_LABELS 1
+
+#text label size factor
+#SIZE_FACTOR 1
+
+#text label rotation
+#LABEL_ROTATION 0
+
+#text label shift in pixels (positive or negative)
+#LABEL_SHIFT 0
+
+
+#Internal tree nodes can be specified using IDs directly, or using the 'last common ancestor' method described in iTOL help pages
+#=================================================================#
+#       Actual data follows after the "DATA" keyword              #
+#=================================================================#
+DATA
+#ID1 value1 value2 value3 value4 value5 value6
+#You can use the 'X' letter instead of the numeric value to denote the empty fields. These will be colored using 'COLOR_NAN' option set above.
+#9606 100 300 250 100 50 210
+EG_MAG_00001 x x x x x x x 1.42388201796166 1.20491117037861 x x 0.894195728717166 x x x 1.46166942469889 x 1.1217622598664 1.67935733316937 x x x x 1.70969890610224 x x x x x 1.22428449147907 1.27289480475117 x x 1.20607770865301 1.03352938075276 x x 1.61242624632892 1.29644000064864 x x x x x 1.5296747943833 x 1.43990304526924 1.30621487397836 1.52990104690839 x
+EG_MAG_00029 x x x x x x x x x x x x x x x x x x 1.13725598307501 x x x x x x x x x x x x x x 0.785730115092218 1.51589638053893 x x 0.910242190987871 x x 0.550280514194968 x x 0.760708169281691 x x x x x x
+EG_MAG_00045 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 1.24896545602 x x x 1.56708974616638 1.01417108655533 x x x x x x x x x x
+EG_MAG_00049 x x x x x x x x x x x x x x x x x 0.634925312828553 0.982961203843631 x x x x x x x x x x x x x x x 1.80258085116025 x x x x 1.75143423388105 x x 1.00341448641104 x x x x x x x
+EG_MAG_00050 x x x 0.949772505270769 x x x x x x x x x x x x x x x x x x x x x x x x x x x x 0.750367001140635 x x x x x x x x x x x x x x x x x
+EG_MAG_00070 0.496879853494654 0.903115772461308 0.627164897693701 x 0.768851141825489 x x 0.892342961098395 x x x 0.895197568174843 x x x x x 0.759148435234037 1.32427353398782 0.640933460884038 0.780521231418037 0.650650134067001 x 1.37105608010304 x x x x x 0.853464396228437 0.781027979407455 x x 0.999474304345881 0.847594106015227 x 1.05137715865545 1.55295985700662 x x x 0.661851732438236 x 0.480435556439969 x x x 0.800965764349737 0.678467131695662 x
+EG_MAG_00077 x x x x x x x x x x x x x x x x x x 0.885284910199986 x x x x x x x x x x x x x x x 1.02536345326504 x x x x 0.729139401089179 x x x x x x x x x x
+EG_MAG_00081 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 1.51111970449939 x x x 1.32163554859662 1.62206327900189 x x x x x x x x x x
+EG_MAG_00110 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 1.60849371986724 x x x 0.767837613522419 0.557751200432955 x x x x x x x x x x
+EG_MAG_00123 x x x x x x 0.540534942171273 x x x x x x x x x 1.05811536497909 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x
+EG_MAG_00124 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 0.771051937370544 x x x
+EG_MAG_00125 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 0.704446811714607 x x x 0.614909499787478 x x x x x x x x x x x x x x x
+EG_MAG_00132 x x x x x x x x x x x x x x x x x x x x x x x 1.09002116672225 x x x x x x x x 0.628383401701838 x x x x x x x x x x x x x x x x x
+EG_MAG_00134 x x x x x x 1.07476962473499 x x x x x x 0.931399499757946 x x x x x x x x x x x x x x x x x x x x 0.70542520121095 x x x 1.20507825042033 0.862061954257131 x x x x x x x x x x
+EG_MAG_00164 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 0.645850876092907 x x x x x x x x x x 0.804812328569345 x x x x x x
+EG_MAG_00207 x x x x x x x x x x x x x x x x x x 1.01408116953751 x x x x x x x x x x x x x x x x x x 0.749315288958005 x x x x x x x x x x x x
+EG_MAG_00216 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 0.780623203143569 x 1.49400468737039 x x x x 1.52140860065301 x x 1.4695016598974 x x x x x x x
+EG_MAG_00230 x x x x x x x x x x x x x x x x x x 0.742714099718258 x x x x x x x x x x x x x x x x x x x x x x x 1.44783916864386 x x x x x x x
+EG_MAG_00241 x x x x x x x x x x x x x x x x x x 1.20979411542721 x x x x x x x x x x x x x 1.4848586852775 1.01553160867524 1.77272876478928 x x x x 0.612923479369079 x x x x x x x x x x
+EG_MAG_00248 x x x x x x 1.36282842162723 x x x x x x x x x x x 0.999332831299593 x x x x x x x x x x x x x 1.11062924837481 x x x x x x x x x x x x x x x x x
+EG_MAG_00249 x x x x x x x x x x x x x x x x x x 1.2144094378872 1.01885514624558 x x x x x x x x x x x x 1.07717944479938 0.957021576319688 1.25604619155504 x x x x 0.997427407413682 x x x 0.788835672042065 x x x x x x
+EG_MAG_00264 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 0.888904734754853 x 0.920335375865941 x x x x x x x x x x x x x x x
+EG_MAG_00272 x x x x x x x x x x x x 0.989595477677106 x x x x x 1.02812096066702 x x x x 0.896643721972618 x x x x x x x x 1.12684411104188 x x x x 1.12250603207213 x x x x x x x x x x x x
+EG_MAG_00275 x x x 0.983925560054239 x x x x x x x x x x x x x x 0.975397630409958 x x x x x x x x x x x x x 1.06293784831428 0.995546772306342 1.3943403295582 x x x 0.718362517954482 0.748422914205263 x x x x x x x x x x
+EG_MAG_00280 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 1.38595821331664 0.602133402605215 x x x x x x x x x x x
+EG_MAG_00288 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 0.734027650971255 x x x x 0.764875008130172 x x x 0.582129309273409 x x x x x x
+EG_MAG_00293 x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 1.1726488682638 x 0.971177997726464 x x x x x x x x x x x x x x x
+EG_MAG_00297 x x x x x x x x x x x x 1.14241953402587 x x x x x x x x x x x x x x x x x x x 1.16109567912753 0.532484773783593 1.04819683848582 x x x x 0.679894942011564 x x x 0.869986501110057 x 0.448381544053379 x x x x
+

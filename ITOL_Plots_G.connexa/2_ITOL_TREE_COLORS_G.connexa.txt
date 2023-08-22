@@ -1,0 +1,15 @@
+TREE_COLORS
+SEPARATOR TAB
+DATA
+
+EG_MAG_00280|EG_MAG_00272	range	#999999	Actinobacteriota
+EG_MAG_00125|EG_MAG_00264	range	#ff0000	Firmicutes
+EG_MAG_00029|EG_MAG_00070	range	#0000ff	Bacteroidota
+EG_MAG_00077	range	#bf9000	Desulfobacterota
+EG_MAG_00241|EG_MAG_00049	range	#ffff00	Proteobacteria
+
+
+
+
+
+

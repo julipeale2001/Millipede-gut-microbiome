@@ -1,0 +1,59 @@
+LABELS 
+#use this template to change the leaf labels, or define/change the internal node names
+#lines starting with a hash are comments and ignored during parsing
+
+#=================================================================#
+#                    MANDATORY SETTINGS                           #
+#=================================================================#
+#select the separator which is used to delimit the data below (TAB,SPACE or COMMA).This separator must be used throughout this file.
+
+SEPARATOR TAB
+#SEPARATOR SPACE
+#SEPARATOR COMMA
+
+
+DATA
+#NODE_ID,LABEL
+
+EG_MAG_00001	Sphingomonas sp003355005
+EG_MAG_00029	Unclassified (Chitinophagaceae)
+EG_MAG_00045	Unclassified (Magnetospirillaceae)
+EG_MAG_00049	Phyllobacterium sp900539805
+EG_MAG_00050	Unclassified (Lachnospirales)
+EG_MAG_00070	Dysgonomonas (Dysgonomonadaceae)
+EG_MAG_00077	Frigididesulfovibrio (Desulfovibrionaceae)
+EG_MAG_00081	Azoarcus (Rhodocyclaceae)
+EG_MAG_00089	Microvirga (Beijerinckiaceae)
+EG_MAG_00110	Unclassified (Acetobacteraceae)
+EG_MAG_00122	Unclassified (Anaplasmataceae)
+EG_MAG_00125	Unclassified (Bacillales)
+EG_MAG_00132	Unclassified (Lachnospirales)
+EG_MAG_00134	Azospirillum (Azospirillaceae)
+EG_MAG_00153	WRLJ01 (Oscillospiraceae)
+EG_MAG_00164	Unclassified (DSM-1321)
+EG_MAG_00185	Niveibacterium (Rhodocyclaceae)
+EG_MAG_00187	Unclassified (Azobacteroidaceae)
+EG_MAG_00201	Unclassified (DSM-1321)
+EG_MAG_00207	Unclassified (DSM-1321)
+EG_MAG_00216	Pararhizobium (Rhizobiaceae)
+EG_MAG_00230	WRAV01 (Ruminococcaceae)
+EG_MAG_00241	Aeromonas aquatica
+EG_MAG_00248	WRMG01 (Oscillospiraceae)
+EG_MAG_00249	Buttiauxella brennerae
+EG_MAG_00264	Unclassified (WRBF01)
+EG_MAG_00272	Microbacterium (Microbacteriaceae)
+EG_MAG_00275	Pantoea cypripedii
+EG_MAG_00280	Microbacterium sp000799385
+EG_MAG_00288	Unclassified (Lachnospirales)
+EG_MAG_00293	Unclassified (Anaerovoracaceae)
+EG_MAG_00297	Enterobacter (Enterobacteriaceae)
+
+
+
+
+
+
+#define a name for an internal node
+#9031|9606,Metazoa
+
+
